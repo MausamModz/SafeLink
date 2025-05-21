@@ -45,24 +45,20 @@ function generateToken() {
 function validateUrl(url) {
     url = url.trim();
     const regex = /^(https?:\/\/)((([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})|localhost)(\/[-a-zA-Z0-9@:%._\+~#?&//=]*)?$/;
-    if (!regex.test(url)) {
-        console.error(`Invalid URL: ${url}`);
-        return false;
-    }
-    return true;
+    return regex.test(url);
 }
 
 function showToast(message, type = 'success') {
     elements.toast.textContent = message;
     elements.toast.style.background = type === 'error' ? '#dc2626' : '#1e40af';
     elements.toast.classList.add('visible');
-    setTimeout(() => elements.toast.classList.remove('visible'), 2000);
+    setTimeout(() => elements.toast.classList.remove('visible'), 1800);
 }
 
 function showError(message) {
     elements.errorMessage.textContent = message;
     elements.errorMessage.classList.add('visible');
-    setTimeout(() => elements.errorMessage.classList.remove('visible'), 2500);
+    setTimeout(() => elements.errorMessage.classList.remove('visible'), 2000);
 }
 
 function updateAnalytics(key) {
@@ -105,7 +101,7 @@ function generateSafeLink() {
     const url = elements.urlInput.value.trim();
     const timerDuration = parseInt(document.getElementById('timer-duration').value);
     if (!validateUrl(url)) {
-        showError('Invalid URL');
+        showError('Enter a valid URL');
         return;
     }
     destinationUrl = url;
@@ -120,7 +116,7 @@ function generateSafeLink() {
     updateAnalytics('linksCreated');
     elements.headerTimerSection.style.display = 'block';
     elements.headerTimerSection.classList.add('active');
-    showToast('SafeLink created!');
+    showToast('SafeLink created');
     scrollToSection(elements.headerTimerSection);
 }
 
@@ -158,13 +154,13 @@ function toggleShare() {
 }
 
 function shareOnTwitter() {
-    const text = encodeURIComponent(`Secure SafeLink: ${elements.safelinkText.value}`);
+    const text = encodeURIComponent(`Check out this SafeLink: ${elements.safelinkText.value}`);
     window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
     showToast('Shared on Twitter');
 }
 
 function shareOnWhatsApp() {
-    const text = encodeURIComponent(`Secure SafeLink: ${elements.safelinkText.value}`);
+    const text = encodeURIComponent(`Check out this SafeLink: ${elements.safelinkText.value}`);
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
     showToast('Shared on WhatsApp');
 }
@@ -176,7 +172,7 @@ function shareOnLinkedIn() {
 }
 
 function scrollToSection(section) {
-    const headerOffset = document.querySelector('header').offsetHeight;
+    const headerOffset = 70;
     const sectionTop = section.getBoundingClientRect().top + window.pageYOffset - headerOffset;
     window.scrollTo({ top: sectionTop, behavior: 'smooth' });
 }
@@ -248,7 +244,7 @@ function startFooterTimer() {
                 elements.destinationLink.href = destinationUrl;
                 elements.destinationLink.classList.add('visible');
                 updateAnalytics('linksCompleted');
-                showToast('Ready to visit!');
+                showToast('Ready to visit');
             } else {
                 showToast('No URL found', 'error');
             }
@@ -282,7 +278,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             e.preventDefault();
             const targetId = this.getAttribute('href');
             const targetElement = document.querySelector(targetId);
-            const headerOffset = document.querySelector('header').offsetHeight;
+            const headerOffset = 70;
             const elementPosition = targetElement.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
             window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
@@ -296,7 +292,7 @@ window.addEventListener('scroll', () => {
     let current = '';
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
-        if (window.pageYOffset >= sectionTop - 60) {
+        if (window.pageYOffset >= sectionTop - 70) {
             current = section.getAttribute('id');
         }
     });
