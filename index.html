@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SafeLink Generator: Create secure, timed-verification links accessible to anyone. Protect your URLs with a simple, professional tool.">
+    <meta name="keywords" content="SafeLink generator, secure URL, timed verification, URL protection, link safety, secure link sharing">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="SafeLink Team">
+    <link rel="canonical" href="https://freeprivacypolicygeneratortool.github.io/safelink/">
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="SafeLink Generator - Secure Link Protection">
+    <meta property="og:description" content="Generate secure links accessible to anyone with SafeLink's timed verification process.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://freeprivacypolicygeneratortool.github.io/safelink/">
+    <meta property="og:image" content="https://freeprivacypolicygeneratortool.github.io/safelink/og-image.jpg">
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SafeLink Generator - Secure Link Protection">
+    <meta name="twitter:description" content="Generate secure links accessible to anyone with SafeLink's timed verification process.">
+    <meta name="twitter:image" content="https://freeprivacypolicygeneratortool.github.io/safelink/og-image.jpg">
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "SafeLink Generator",
+        "url": "https://freeprivacypolicygeneratortool.github.io/safelink/",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://freeprivacypolicygeneratortool.github.io/safelink/?utm_token={search_term}",
+            "query-input": "required name=search_term"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "SafeLink Team"
+        }
+    }
+    </script>
+    <title>SafeLink Generator - Secure Link Protection</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">SafeLink<span class="logo-highlight">Pro</span></div>
+            <div class="nav-links">
+                <a href="#home" aria-label="Home Section">Home</a>
+                <a href="#how-it-works" aria-label="How It Works Section">How It Works</a>
+                <a href="#about" aria-label="About Section">About</a>
+                <a href="#contact" aria-label="Contact Section">Contact</a>
+                <button class="contrast-toggle" aria-label="Toggle high contrast mode">Contrast</button>
+            </div>
+        </nav>
+        <div class="timer-section" id="header-timer" role="region" aria-live="polite">
+            <button class="cta-button" id="robot-button" aria-label="Start Verification">I'm not a Robot</button>
+            <p id="header-timer-text" style="display: none;">Step 1: Verification Timer: <span id="header-timer-count">30</span>s</p>
+            <div class="progress-container" id="header-progress-container" style="display: none;">
+                <div class="progress-bar" id="header-progress-bar"></div>
+            </div>
+            <p class="timer-message" id="header-timer-message"></p>
+            <div class="loading-spinner" id="header-spinner" style="display: none;" aria-hidden="true"></div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h1>Secure Links for Everyone</h1>
+                <p>Generate SafeLinks with timed verification that anyone can use, no signup required.</p>
+                <div class="url-input">
+                    <input type="url" id="destination-url" placeholder="Enter URL (e.g., https://example.com)" aria-label="Enter destination URL" required>
+                    <select id="timer-duration" aria-label="Select timer duration">
+                        <option value="15">15 seconds</option>
+                        <option value="30" selected>30 seconds</option>
+                        <option value="45">45 seconds</option>
+                        <option value="60">60 seconds</option>
+                    </select>
+                    <button class="cta-button" onclick="generateSafeLink()" aria-label="Generate SafeLink">Generate SafeLink</button>
+                </div>
+                <p class="error-message" id="error-message" role="alert"></p>
+                <div class="safelink-output" id="safelink-output">
+                    <span id="safelink-text"></span>
+                    <button class="copy-button" id="copy-button" style="display: none;" aria-label="Copy SafeLink">Copy SafeLink</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="ad-slot" aria-label="Advertisement" data-ad="true">AdSense Banner (728x90)</div>
+
+        <section class="how-it-works" id="how-it-works">
+            <h2>How SafeLink Pro Works</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-icon">1</div>
+                    <h3>Create SafeLink</h3>
+                    <p>Enter a URL and timer duration to generate a shareable SafeLink.</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">2</div>
+                    <h3>Verify Access</h3>
+                    <p>Share the link; anyone can complete three timed steps to access.</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">3</div>
+                    <h3>Visit URL</h3>
+                    <p>Reach the destination URL securely in a new tab.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="features" id="features">
+            <h2>Why SafeLink Pro?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Universal Access</h3>
+                    <p>Anyone can use SafeLinks without local storage or signups.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Secure Design</h3>
+                    <p>24-hour expiry and encoded URLs ensure link safety.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Custom Timers</h3>
+                    <p>Choose verification timers from 15 to 60 seconds.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Accessible UI</h3>
+                    <p>WCAG-compliant with keyboard navigation and contrast toggle.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="middle-timer-section" id="middle-timer" role="region" aria-live="polite">
+            <button class="cta-button" id="verify-button" aria-label="Verify Step">Verify</button>
+            <p id="middle-timer-text" style="display: none;">Step 2: Verification Timer: <span id="middle-timer-count">30</span>s</p>
+            <div class="progress-container" id="middle-progress-container" style="display: none;">
+                <div class="progress-bar" id="middle-progress-bar"></div>
+            </div>
+            <p class="timer-message" id="middle-timer-message"></p>
+            <div class="loading-spinner" id="middle-spinner" style="display: none;" aria-hidden="true"></div>
+        </div>
+
+        <section class="about" id="about">
+            <h2>About SafeLink Pro</h2>
+            <p>SafeLink Pro, crafted by the SafeLink Team, offers a secure, accessible way to share links. Our mission is to make URL protection simple and universal, trusted globally.</p>
+        </section>
+
+        <div class="ad-slot" aria-label="Advertisement" data-ad="true">AdSense Banner (728x90)</div>
+
+        <section class="destination-section" id="destination-section" role="region" aria-live="polite">
+            <button class="cta-button" id="ready-button" aria-label="Final Verification Step">I'm Ready to Go</button>
+            <p id="footer-timer-text" style="display: none;">Step 3: Final Timer: <span id="footer-timer-count">30</span>s</p>
+            <div class="progress-container" id="footer-progress-container" style="display: none;">
+                <div class="progress-bar" id="footer-progress-bar"></div>
+            </div>
+            <p class="timer-message" id="footer-timer-message"></p>
+            <div class="loading-spinner" id="footer-spinner" style="display: none;" aria-hidden="true"></div>
+            <a href="#" id="destination-link" class="destination-link" target="_blank" aria-label="Go to destination URL">Go to Destination</a>
+        </section>
+    </main>
+
+    <footer id="contact">
+        <p>© 2025 SafeLink Pro. All rights reserved. | <a href="/privacy-policy" aria-label="Privacy Policy">Privacy Policy</a> | <a href="/terms-of-service" aria-label="Terms of Service">Terms of Service</a> | <a href="#contact-form" aria-label="Contact Us">Contact Us</a></p>
+        <p>Secured with HTTPS | Developed by SafeLink Team</p>
+    </footer>
+
+    <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
