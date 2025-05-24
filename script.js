@@ -1,6 +1,3 @@
-// SafeLink Timer Redirect Script
-// Author: Jaydatt Mahendra Khodave
-
 let headerTime = 30;
 let middleTime = 30;
 let footerTime = 30;
@@ -38,8 +35,7 @@ const elements = {
     socialShare: document.getElementById('social-share'),
     linksCreated: document.getElementById('links-created'),
     linksCompleted: document.getElementById('links-completed'),
-    urlInput: document.getElementById('destination-url'),
-    timerDurationInput: document.getElementById('timer-duration')
+    urlInput: document.getElementById('destination-url')
 };
 
 function generateToken() {
@@ -47,8 +43,9 @@ function generateToken() {
 }
 
 function validateUrl(url) {
-    const regex = /^(https?:\/\/)((([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})|localhost)(\/[\w\-@:%_\+.~#?,&//=]*)?$/;
-    return regex.test(url.trim());
+    url = url.trim();
+    const regex = /^(https?:\/\/)((([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})|localhost)(\/[-a-zA-Z0-9@:%._\+~#?&//=]*)?$/;
+    return regex.test(url);
 }
 
 function showToast(message, type = 'success') {
@@ -74,7 +71,7 @@ function encodeUrl(url) {
     try {
         return btoa(url);
     } catch (e) {
-        console.error('Encoding failed:', e);
+        console.error(`Failed to encode URL: ${url}`);
         return '';
     }
 }
@@ -83,7 +80,7 @@ function decodeUrl(encodedUrl) {
     try {
         return atob(encodedUrl);
     } catch (e) {
-        console.error('Decoding failed:', e);
+        console.error(`Invalid Base64 URL: ${encodedUrl}`);
         return '';
     }
 }
@@ -96,25 +93,26 @@ function updateQueryParams(stage) {
         stage
     });
     safeLinkUrl = `/safelink/?${params.toString()}`;
-    history.replaceState({}, '', safeLinkUrl);
+    window.history.replaceState({}, '', safeLinkUrl);
     elements.safelinkText.value = `https://freeprivacypolicygeneratortool.github.io${safeLinkUrl}`;
 }
 
 function generateSafeLink() {
-    const url = elements.urlInput.value;
-    const timerDuration = parseInt(elements.timerDurationInput.value);
-
-    if (!validateUrl(url)) return showError('Enter a valid URL');
-
-    destinationUrl = url.trim();
+    const url = elements.urlInput.value.trim();
+    const timerDuration = parseInt(document.getElementById('timer-duration').value);
+    if (!validateUrl(url)) {
+        showError('Enter a valid URL');
+        return;
+    }
+    destinationUrl = url;
     activeToken = generateToken();
-    headerTime = middleTime = footerTime = timerDuration;
-
+    headerTime = timerDuration;
+    middleTime = timerDuration;
+    footerTime = timerDuration;
     updateQueryParams('header');
     elements.safelinkOutput.style.display = 'block';
     elements.copyButton.style.display = 'block';
     elements.shareToggle.style.display = 'block';
-
     updateAnalytics('linksCreated');
     elements.headerTimerSection.style.display = 'block';
     elements.headerTimerSection.classList.add('active');
@@ -124,9 +122,16 @@ function generateSafeLink() {
 
 function copySafeLink() {
     const text = elements.safelinkText.value;
-    navigator.clipboard?.writeText(text)
-        .then(() => showToast('URL is Copied'))
-        .catch(err => fallbackCopy(text));
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('URL is Copied');
+        }).catch(err => {
+            console.error('Clipboard API failed:', err);
+            fallbackCopy(text);
+        });
+    } else {
+        fallbackCopy(text);
+    }
 }
 
 function fallbackCopy(text) {
@@ -137,7 +142,8 @@ function fallbackCopy(text) {
     try {
         document.execCommand('copy');
         showToast('URL is Copied');
-    } catch {
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
         showToast('Copy Failed', 'error');
     }
     document.body.removeChild(textarea);
@@ -147,109 +153,193 @@ function toggleShare() {
     elements.socialShare.style.display = elements.socialShare.style.display === 'flex' ? 'none' : 'flex';
 }
 
-function shareOn(platform) {
+function shareOnTwitter() {
     const text = encodeURIComponent(`Check out this SafeLink: ${elements.safelinkText.value}`);
-    const urls = {
-        twitter: `https://twitter.com/intent/tweet?text=${text}`,
-        whatsapp: `https://api.whatsapp.com/send?text=${text}`,
-        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${text}`
-    };
-    if (urls[platform]) window.open(urls[platform], '_blank');
-    showToast(`Shared on ${platform.charAt(0).toUpperCase() + platform.slice(1)}`);
+    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+    showToast('Shared on Twitter');
+}
+
+function shareOnWhatsApp() {
+    const text = encodeURIComponent(`Check out this SafeLink: ${elements.safelinkText.value}`);
+    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+    showToast('Shared on WhatsApp');
+}
+
+function shareOnLinkedIn() {
+    const url = encodeURIComponent(elements.safelinkText.value);
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+    showToast('Shared on LinkedIn');
 }
 
 function scrollToSection(section) {
-    const offset = 70;
-    const top = section.getBoundingClientRect().top + window.scrollY - offset;
-    window.scrollTo({ top, behavior: 'smooth' });
+    const headerOffset = 70;
+    const sectionTop = section.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+    window.scrollTo({ top: sectionTop, behavior: 'smooth' });
 }
 
-function startTimer(section, timeKey, intervalRef, nextSection, queryStage) {
-    if (intervalRef) clearInterval(intervalRef);
-
-    elements[`${section}Spinner`].style.display = 'block';
-    elements[`${section}Button`].style.display = 'none';
-
+function startHeaderTimer() {
+    if (headerInterval) clearInterval(headerInterval);
+    elements.robotButton.style.display = 'none';
+    elements.headerSpinner.style.display = 'block';
     setTimeout(() => {
-        elements[`${section}Spinner`].style.display = 'none';
-        elements[`${section}TimerText`].style.display = 'block';
+        elements.headerSpinner.style.display = 'none';
+        elements.headerTimerText.style.display = 'block';
     }, 300);
-
-    intervalRef = setInterval(() => {
-        if (window[timeKey] > 0) {
-            window[timeKey]--;
-            elements[`${section}TimerCount`].textContent = window[timeKey];
+    headerInterval = setInterval(() => {
+        if (headerTime > 0) {
+            headerTime--;
+            elements.headerTimerCount.textContent = headerTime;
         } else {
-            clearInterval(intervalRef);
-            elements[`${section}TimerText`].style.display = 'none';
-            elements[`${section}TimerSection`].classList.remove('active');
-            elements[`${section}TimerSection`].style.display = 'none';
+            clearInterval(headerInterval);
+            elements.headerTimerSection.style.display = 'none';
+            elements.headerTimerSection.classList.remove('active');
+            elements.middleTimerSection.style.display = 'block';
+            elements.middleTimerSection.classList.add('active');
+            updateQueryParams('middle');
+            scrollToSection(elements.middleTimerSection);
+        }
+    }, 1000);
+}
 
-            if (nextSection) {
-                elements[`${nextSection}TimerSection`].style.display = 'block';
-                elements[`${nextSection}TimerSection`].classList.add('active');
-                updateQueryParams(queryStage);
-                scrollToSection(elements[`${nextSection}TimerSection`]);
+function startMiddleTimer() {
+    if (middleInterval) clearInterval(middleInterval);
+    elements.verifyButton.style.display = 'none';
+    elements.middleSpinner.style.display = 'block';
+    setTimeout(() => {
+        elements.middleSpinner.style.display = 'none';
+        elements.middleTimerText.style.display = 'block';
+    }, 300);
+    middleInterval = setInterval(() => {
+        if (middleTime > 0) {
+            middleTime--;
+            elements.middleTimerCount.textContent = middleTime;
+        } else {
+            clearInterval(middleInterval);
+            elements.middleTimerSection.style.display = 'none';
+            elements.middleTimerSection.classList.remove('active');
+            elements.destinationSection.style.display = 'block';
+            elements.destinationSection.classList.add('active');
+            updateQueryParams('footer');
+            scrollToSection(elements.destinationSection);
+        }
+    }, 1000);
+}
+
+function startFooterTimer() {
+    if (footerInterval) clearInterval(footerInterval);
+    elements.readyButton.style.display = 'none';
+    elements.footerSpinner.style.display = 'block';
+    setTimeout(() => {
+        elements.footerSpinner.style.display = 'none';
+        elements.footerTimerText.style.display = 'block';
+    }, 300);
+    footerInterval = setInterval(() => {
+        if (footerTime > 0) {
+            footerTime--;
+            elements.footerTimerCount.textContent = footerTime;
+        } else {
+            clearInterval(footerInterval);
+            elements.footerTimerText.style.display = 'none';
+            if (destinationUrl) {
+                elements.destinationLink.href = destinationUrl;
+                elements.destinationLink.classList.add('visible');
+                updateAnalytics('linksCompleted');
+                showToast('Ready to visit');
             } else {
-                if (destinationUrl) {
-                    elements.destinationLink.href = destinationUrl;
-                    elements.destinationLink.classList.add('visible');
-                    updateAnalytics('linksCompleted');
-                    showToast('Ready to visit');
-                } else {
-                    showToast('No URL found', 'error');
-                }
+                showToast('No URL found', 'error');
             }
         }
     }, 1000);
-
-    return intervalRef;
 }
 
-elements.robotButton.onclick = () => headerInterval = startTimer('header', 'headerTime', headerInterval, 'middle', 'middle');
-elements.verifyButton.onclick = () => middleInterval = startTimer('middle', 'middleTime', middleInterval, 'footer', 'footer');
-elements.readyButton.onclick = () => footerInterval = startTimer('footer', 'footerTime', footerInterval, null, 'final');
+elements.robotButton.addEventListener('click', startHeaderTimer);
+elements.verifyButton.addEventListener('click', startMiddleTimer);
+elements.readyButton.addEventListener('click', startFooterTimer);
 
-elements.copyButton.onclick = copySafeLink;
-elements.shareToggle.onclick = toggleShare;
+elements.destinationLink.addEventListener('click', (e) => {
+    if (!destinationUrl) {
+        e.preventDefault();
+        showToast('No URL found', 'error');
+    }
+});
 
-document.getElementById('generate-button').onclick = generateSafeLink;
-document.getElementById('share-twitter').onclick = () => shareOn('twitter');
-document.getElementById('share-whatsapp').onclick = () => shareOn('whatsapp');
-document.getElementById('share-linkedin').onclick = () => shareOn('linkedin');
+document.querySelectorAll('.cta-button, .copy-button, .destination-link, .share-button, .share-toggle').forEach(el => {
+    el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            el.click();
+        }
+    });
+});
 
-document.addEventListener('DOMContentLoaded', () => {
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    if (anchor.id !== 'destination-link') {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            const headerOffset = 70;
+            const elementPosition = targetElement.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+        });
+    }
+});
+
+window.addEventListener('scroll', () => {
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (window.pageYOffset >= sectionTop - 70) {
+            current = section.getAttribute('id');
+        }
+    });
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').includes(current)) {
+            link.classList.add('active');
+        }
+    });
+});
+
+window.addEventListener('load', () => {
     elements.urlInput.focus();
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('utm_token');
     const encodedUrl = urlParams.get('url');
     const duration = parseInt(urlParams.get('duration')) || 30;
     const stage = urlParams.get('stage');
-
-    if (token && encodedUrl && stage) {
+    if (token && encodedUrl && duration && stage) {
         const decodedUrl = decodeUrl(encodedUrl);
-        if (!validateUrl(decodedUrl)) return showToast('Invalid URL', 'error');
-
+        if (!validateUrl(decodedUrl)) {
+            showToast('Invalid URL', 'error');
+            return;
+        }
         destinationUrl = decodedUrl;
+        headerTime = duration;
+        middleTime = duration;
+        footerTime = duration;
         activeToken = token;
-        headerTime = middleTime = footerTime = duration;
         safeLinkUrl = `/safelink/?${urlParams.toString()}`;
-
         elements.safelinkText.value = `https://freeprivacypolicygeneratortool.github.io${safeLinkUrl}`;
         elements.safelinkOutput.style.display = 'block';
         elements.copyButton.style.display = 'block';
         elements.shareToggle.style.display = 'block';
-        elements.timerDurationInput.value = duration;
-
+        document.getElementById('timer-duration').value = duration;
         if (stage === 'header') {
             elements.headerTimerSection.style.display = 'block';
             elements.headerTimerSection.classList.add('active');
             scrollToSection(elements.headerTimerSection);
         } else if (stage === 'middle') {
+            elements.headerTimerSection.style.display = 'none';
             elements.middleTimerSection.style.display = 'block';
             elements.middleTimerSection.classList.add('active');
             scrollToSection(elements.middleTimerSection);
         } else if (stage === 'footer') {
+            elements.headerTimerSection.style.display = 'none';
+            elements.middleTimerSection.style.display = 'none';
             elements.destinationSection.style.display = 'block';
             elements.destinationSection.classList.add('active');
             scrollToSection(elements.destinationSection);
