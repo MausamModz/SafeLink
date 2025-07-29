@@ -7,7 +7,6 @@ let activeToken = '';
 let headerInterval = null;
 let middleInterval = null;
 let footerInterval = null;
-let analytics = { linksCreated: 0, linksCompleted: 0 };
 
 const elements = {
     headerTimerSection: document.getElementById('header-timer'),
@@ -33,8 +32,6 @@ const elements = {
     errorMessage: document.getElementById('error-message'),
     toast: document.getElementById('toast'),
     socialShare: document.getElementById('social-share'),
-    linksCreated: document.getElementById('links-created'),
-    linksCompleted: document.getElementById('links-completed'),
     urlInput: document.getElementById('destination-url')
 };
 
@@ -59,12 +56,6 @@ function showError(message) {
     elements.errorMessage.textContent = message;
     elements.errorMessage.classList.add('visible');
     setTimeout(() => elements.errorMessage.classList.remove('visible'), 2000);
-}
-
-function updateAnalytics(key) {
-    analytics[key]++;
-    elements.linksCreated.textContent = analytics.linksCreated;
-    elements.linksCompleted.textContent = analytics.linksCompleted;
 }
 
 function encodeUrl(url) {
@@ -95,6 +86,10 @@ function updateQueryParams(stage) {
     safeLinkUrl = `/safelink/?${params.toString()}`;
     window.history.replaceState({}, '', safeLinkUrl);
     elements.safelinkText.value = `https://freeprivacypolicygeneratortool.github.io${safeLinkUrl}`;
+    // Trigger ad refresh if necessary
+    if (window.adsbygoogle) {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    }
 }
 
 function generateSafeLink() {
@@ -113,7 +108,6 @@ function generateSafeLink() {
     elements.safelinkOutput.style.display = 'block';
     elements.copyButton.style.display = 'block';
     elements.shareToggle.style.display = 'block';
-    updateAnalytics('linksCreated');
     elements.headerTimerSection.style.display = 'block';
     elements.headerTimerSection.classList.add('active');
     showToast('SafeLink created');
@@ -243,7 +237,6 @@ function startFooterTimer() {
             if (destinationUrl) {
                 elements.destinationLink.href = destinationUrl;
                 elements.destinationLink.classList.add('visible');
-                updateAnalytics('linksCompleted');
                 showToast('Ready to visit');
             } else {
                 showToast('No URL found', 'error');
@@ -344,5 +337,9 @@ window.addEventListener('load', () => {
             elements.destinationSection.classList.add('active');
             scrollToSection(elements.destinationSection);
         }
+    }
+    // Initialize AdSense ads
+    if (window.adsbygoogle) {
+        (adsbygoogle = window.adsbygoogle || []).push({});
     }
 });
