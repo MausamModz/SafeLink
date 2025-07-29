@@ -86,10 +86,6 @@ function updateQueryParams(stage) {
     safeLinkUrl = `/safelink/?${params.toString()}`;
     window.history.replaceState({}, '', safeLinkUrl);
     elements.safelinkText.value = `https://freeprivacypolicygeneratortool.github.io${safeLinkUrl}`;
-    // Trigger ad refresh if necessary
-    if (window.adsbygoogle) {
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    }
 }
 
 function generateSafeLink() {
@@ -337,9 +333,5 @@ window.addEventListener('load', () => {
             elements.destinationSection.classList.add('active');
             scrollToSection(elements.destinationSection);
         }
-    }
-    // Initialize AdSense ads
-    if (window.adsbygoogle) {
-        (adsbygoogle = window.adsbygoogle || []).push({});
     }
 });

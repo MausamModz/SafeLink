@@ -358,39 +358,9 @@ nav {
 }
 
 .ad-slot {
-    margin: 2rem auto;
-    text-align: center;
-    padding: 1rem;
     background: #e2e8f0;
-    border-radius: 10px;
-}
-
-.ad-slot.ad-banner {
-    max-width: 728px;
-    min-height: 90px;
-}
-
-.ad-slot.ad-in-content {
-    max-width: 336px;
-    min-height: 280px;
-}
-
-.ad-slot.ad-sidebar {
-    display: none;
-    max-width: 300px;
-    min-height: 250px;
-    position: sticky;
-    top: 80px;
-    margin: 1rem auto;
-}
-
-@media (min-width: 1024px) {
-    .ad-slot.ad-sidebar {
-        display: block;
-        position: fixed;
-        right: 1rem;
-        top: 80px;
-    }
+    text-align: center;
+    color: #64748b;
 }
 
 .destination-link {
@@ -476,16 +446,6 @@ footer p {
     .steps-container, .feature-grid {
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     }
-
-    .ad-slot.ad-banner {
-        max-width: 100%;
-        min-height: 100px;
-    }
-
-    .ad-slot.ad-in-content {
-        max-width: 100%;
-        min-height: 250px;
-    }
 }
 
 @media (max-width: 768px) {
@@ -503,6 +463,10 @@ footer p {
 
     .steps-container, .feature-grid {
         grid-template-columns: 1fr;
+    }
+
+    .ad-slot {
+        height: 100px;
     }
 
     .cta-button, .share-toggle, .copy-button, .share-button, .destination-link {
@@ -543,10 +507,5 @@ footer p {
         right: 1rem;
         font-size: 0.85rem;
         padding: 0.5rem 1rem;
-    }
-
-    .ad-slot.ad-banner, .ad-slot.ad-in-content {
-        max-width: 100%;
-        min-height: 100px;
     }
 }
